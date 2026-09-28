@@ -28,7 +28,26 @@ Trong các công trường xây dựng và nhà xưởng công nghiệp, việc 
 4. **Bộ lọc Voting đa khung hình (8/10 frames)** loại bỏ hiện tượng nhấp nháy (flickering), đảm bảo quyết định chuẩn xác.
 5. Hiển thị kết quả trực quan khổng lồ: **PASS (Xanh lá)** hoặc **FAIL (Đỏ)** và thông báo rõ các món còn thiếu.
 6. Ghi nhận nhật ký ra vào vào cơ sở dữ liệu SQLite theo đúng tiêu chuẩn bảo vệ quyền riêng tư: **TUYỆT ĐỐI KHÔNG LƯU ẢNH CỦA CÔNG NHÂN**.
-7. **Đa nền tảng giao diện:** Hỗ trợ ứng dụng **Flutter (Web & Desktop)**, ứng dụng **OpenCV Realtime Gate**, và **Streamlit Web Dashboard**.
+7. **Đa nền tảng giao diện:**
+   - 🌐 **Web Quản lý HSE (GitHub Pages Host):** [https://v2tacodin.github.io/SafeGate/](https://v2tacodin.github.io/SafeGate/) (Không cần cài đặt, xem & in thẻ QR, xuất CSV, phân tích an toàn).
+   - 📱 **Ứng dụng Flutter Client (Web & Windows Desktop):** Giao diện cổng kiểm soát thời gian thực.
+   - 💻 **Ứng dụng OpenCV Gate Runner:** Giao diện camera thời gian thực hỗ trợ cả webcam vật lý lẫn camera giả lập.
+   - 📊 **Streamlit Dashboard:** Bảng điều khiển quản trị cục bộ.
+
+---
+
+## 🌐 BẢN PHẦN MỀM / WEB DÀNH CHO QUẢN LÝ (GITHUB PAGES)
+
+Trang web quản lý dành cho cán bộ an toàn (HSE) và ban chỉ huy công trường được host trực tiếp trên **GitHub Pages**:
+
+👉 **Truy cập trực tuyến:** **[https://v2tacodin.github.io/SafeGate/](https://v2tacodin.github.io/SafeGate/)**
+
+### Các tính năng chính trên Web GitHub Pages:
+- 📈 **Bảng điều khiển tổng quan (Executive Dashboard):** Giám sát tổng số lượt kiểm tra, tỷ lệ tuân thủ HSE (%), biểu đồ lưu lượng theo khung giờ cao điểm và danh sách cảnh báo vi phạm gần nhất.
+- 📋 **Nhật ký ra vào & Xuất CSV:** Tra cứu, lọc theo trạng thái PASS/FAIL, theo nhà thầu/đội thi công. Hỗ trợ **xuất file CSV (UTF-8 BOM)** mở được ngay trên Microsoft Excel.
+- 🪪 **Quản lý Nhân viên & In Thẻ QR:** Xem danh sách công nhân, đăng ký công nhân mới, tự động sinh mã QR chất lượng cao và hỗ trợ **In ấn thẻ nhân viên chuẩn kích thước** trực tiếp từ trình duyệt (`Ctrl + P`).
+- 📊 **Phân tích an toàn lao động:** Thống kê phân loại các lỗi vi phạm phổ biến (thiếu mũ, thiếu áo phản quang, cầm mũ trên tay...) và xếp hạng mức độ tuân thủ theo nhà thầu.
+- 🔄 **Chế độ Kép (Dual Mode):** Chạy 100% độc lập trên đám mây (Cloud Demo với LocalStorage) hoặc kết nối đồng bộ trực tiếp tới máy trạm SafeGate AI (`http://localhost:8000`).
 
 ---
 

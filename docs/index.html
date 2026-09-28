@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeGate HSE Portal - Quản lý Cổng An Toàn & PPE</title>
+  <meta name="description" content="Cổng thông tin quản lý an toàn lao động, kiểm soát đồ bảo hộ (PPE) và nhật ký ra vào công trường SafeGate">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- QR Code Generator Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- APP SHELL -->
+  <div class="app-layout">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">SAFEGATE</span>
+          <span class="brand-badge">HSE PORTAL</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-menu">
+        <button class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Tổng quan</span>
+        </button>
+        <button class="nav-item" id="nav-logs" onclick="switchTab('logs')">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Nhật ký ra vào</span>
+        </button>
+        <button class="nav-item" id="nav-workers" onclick="switchTab('workers')">
+          <i class="fa-solid fa-id-card-clip"></i>
+          <span>Nhân viên & Thẻ QR</span>
+        </button>
+        <button class="nav-item" id="nav-analytics" onclick="switchTab('analytics')">
+          <i class="fa-solid fa-chart-column"></i>
+          <span>Phân tích an toàn</span>
+        </button>
+        <button class="nav-item" id="nav-sync" onclick="switchTab('sync')">
+          <i class="fa-solid fa-network-wired"></i>
+          <span>Kết nối trạm AI</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status-card">
+          <div class="status-indicator">
+            <span class="pulse-dot"></span>
+            <span id="gateway-status-text">GitHub Cloud Mode</span>
+          </div>
+          <p class="status-sub" id="gateway-url-display">Trực tuyến trên GitHub Pages</p>
+        </div>
+        <div class="project-credit">
+          <small>Đề tài CNPM 2026 • AI PPE System</small>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <main class="main-content">
+      
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div>
+            <h1 class="page-title" id="page-heading">BẢNG ĐIỀU KHIỂN TỔNG QUAN</h1>
+            <p class="page-desc" id="page-subheading">Giám sát mức độ tuân thủ trang bị bảo hộ lao động theo thời gian thực</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="live-clock">
+            <i class="fa-regular fa-clock"></i>
+            <span id="live-time">--:--:--</span>
+          </div>
+          <button class="btn-refresh" onclick="refreshCurrentTab()" title="Làm mới dữ liệu">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+          <a href="https://github.com/v2tAcodin/SafeGate" target="_blank" class="btn-github" title="Mã nguồn GitHub">
+            <i class="fa-brands fa-github"></i>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- TAB 1: EXECUTIVE DASHBOARD -->
+      <section class="tab-pane active" id="tab-dashboard">
+        <!-- 4 Metric Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card cyan">
+            <div class="metric-header">
+              <span class="metric-title">TỔNG LƯỢT KIỂM TRA</span>
+              <i class="fa-solid fa-fingerprint metric-icon"></i>
+            </div>
+            <div class="metric-value" id="kpi-total-checks">142</div>
+            <div class="metric-trend up">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+              <span>+18% so với hôm qua</span>
+            </div>
+          </div>
+
+          <div class="metric-card green">
+            <div class="metric-header">
+              <span class="metric-title">LƯỢT ĐẠT CHUẨN (PASS)</span>
+              <i class="fa-solid fa-circle-check metric-icon"></i>
+            </div>
+            <div class="metric-value" id="kpi-pass-count">134</div>
+            <div class="metric-trend positive">
+              <i class="fa-solid fa-user-shield"></i>
+              <span>Được phép vào công trường</span>
+            </div>
+          </div>
+
+          <div class="metric-card red">
+            <div class="metric-header">
+              <span class="metric-title">VI PHẠM BỊ CHẶN (FAIL)</span>
+              <i class="fa-solid fa-triangle-exclamation metric-icon"></i>
+            </div>
+            <div class="metric-value" id="kpi-fail-count">8</div>
+            <div class="metric-trend negative">
+              <i class="fa-solid fa-hand"></i>
+              <span>Yêu cầu bổ sung trang bị</span>
+            </div>
+          </div>
+
+          <div class="metric-card blue">
+            <div class="metric-header">
+              <span class="metric-title">TỶ LỆ TUÂN THỦ (HSE)</span>
+              <i class="fa-solid fa-shield-virus metric-icon"></i>
+            </div>
+            <div class="metric-value" id="kpi-pass-rate">94.4%</div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="kpi-progress-bar" style="width: 94.4%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Charts & Feed -->
+        <div class="dashboard-row">
+          <!-- Biểu đồ khung giờ cao điểm -->
+          <div class="panel-card chart-panel">
+            <div class="panel-header">
+              <h2 class="panel-title">
+                <i class="fa-solid fa-chart-line"></i> Lưu lượng qua cổng theo khung giờ
+              </h2>
+              <span class="badge-time">Hôm nay</span>
+            </div>
+            <div class="chart-container">
+              <div class="bar-chart-visual" id="hourly-chart">
+                <!-- Bars dynamically rendered by JS -->
+              </div>
+            </div>
+            <div class="chart-footer">
+              <span class="legend-item"><span class="legend-box pass"></span> Lượt Đạt (PASS)</span>
+              <span class="legend-item"><span class="legend-box fail"></span> Vi phạm (FAIL)</span>
+            </div>
+          </div>
+
+          <!-- Danh sách cảnh báo gần nhất -->
+          <div class="panel-card alert-panel">
+            <div class="panel-header">
+              <h2 class="panel-title">
+                <i class="fa-solid fa-bell"></i> Sự kiện kiểm tra gần nhất
+              </h2>
+              <button class="btn-text-link" onclick="switchTab('logs')">Xem tất cả</button>
+            </div>
+            <div class="recent-alerts-list" id="recent-alerts-list">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: ACCESS LOGS -->
+      <section class="tab-pane" id="tab-logs">
+        <div class="panel-card table-panel">
+          <div class="panel-header table-actions">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="log-search-input" placeholder="Tìm theo tên, mã nhân viên, đội thi công..." oninput="filterLogsTable()">
+            </div>
+
+            <div class="filter-group">
+              <select id="log-status-select" onchange="filterLogsTable()">
+                <option value="ALL">Tất cả trạng thái</option>
+                <option value="PASS">Chỉ lượt PASS (Đạt)</option>
+                <option value="FAIL">Chỉ lượt FAIL (Vi phạm)</option>
+              </select>
+
+              <select id="log-dept-select" onchange="filterLogsTable()">
+                <option value="ALL">Tất cả bộ phận / Đội</option>
+                <option value="Thi công kết cấu">Thi công kết cấu</option>
+                <option value="Cơ điện MEP">Cơ điện MEP</option>
+                <option value="Hoàn thiện xây dựng">Hoàn thiện xây dựng</option>
+                <option value="Ban an toàn HSE">Ban an toàn HSE</option>
+              </select>
+
+              <button class="btn-primary" onclick="exportLogsToCSV()">
+                <i class="fa-solid fa-file-csv"></i> Xuất CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table" id="access-logs-table">
+              <thead>
+                <tr>
+                  <th>Thời gian</th>
+                  <th>Mã NV</th>
+                  <th>Họ và tên</th>
+                  <th>Bộ phận / Nhà thầu</th>
+                  <th>Trạng thái</th>
+                  <th>Lỗi ghi nhận / Ghi chú</th>
+                  <th>Voting AI</th>
+                  <th>Xử lý</th>
+                </tr>
+              </thead>
+              <tbody id="logs-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-footer">
+            <span id="log-count-summary">Hiển thị 0 bản ghi</span>
+            <div class="privacy-note">
+              <i class="fa-solid fa-lock"></i>
+              <span>Tiêu chuẩn bảo mật: Hệ thống tuyệt đối không lưu trữ hình ảnh của công nhân</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: WORKERS & QR BADGES -->
+      <section class="tab-pane" id="tab-workers">
+        <div class="workers-toolbar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="worker-search-input" placeholder="Tìm kiếm công nhân..." oninput="filterWorkersGrid()">
+          </div>
+          <button class="btn-primary" onclick="openAddWorkerModal()">
+            <i class="fa-solid fa-user-plus"></i> Đăng ký công nhân mới
+          </button>
+        </div>
+
+        <div class="workers-grid" id="workers-card-grid">
+          <!-- Worker cards rendered by JS -->
+        </div>
+      </section>
+
+      <!-- TAB 4: SAFETY ANALYTICS -->
+      <section class="tab-pane" id="tab-analytics">
+        <div class="analytics-layout">
+          <!-- Top Vi phạm -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <h2 class="panel-title"><i class="fa-solid fa-triangle-exclamation"></i> Phân loại các lỗi an toàn phổ biến</h2>
+            </div>
+            <div class="violations-bar-list" id="violations-list">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Xếp hạng Đội thi công -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <h2 class="panel-title"><i class="fa-solid fa-ranking-star"></i> Mức độ tuân thủ theo nhà thầu / Đội thi công</h2>
+            </div>
+            <div class="ranking-table-container">
+              <table class="data-table compact" id="contractor-ranking-table">
+                <thead>
+                  <tr>
+                    <th>Hạng</th>
+                    <th>Đơn vị thi công</th>
+                    <th>Lượt check</th>
+                    <th>Tỷ lệ Đạt</th>
+                    <th>Đánh giá</th>
+                  </tr>
+                </thead>
+                <tbody id="ranking-table-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: GATEWAY & SETTINGS -->
+      <section class="tab-pane" id="tab-sync">
+        <div class="settings-card panel-card">
+          <div class="panel-header">
+            <h2 class="panel-title"><i class="fa-solid fa-server"></i> Kết nối máy chủ SafeGate AI Gateway</h2>
+          </div>
+          <div class="settings-body">
+            <p class="settings-desc">
+              Bạn có thể sử dụng web này ở chế độ <strong>Độc lập (Cloud Demo)</strong> hoặc kết nối trực tiếp đến trạm máy tính SafeGate đặt tại cổng công trường để nhận dữ liệu thật:
+            </p>
+
+            <div class="form-group">
+              <label for="gateway-url-input">Địa chỉ SafeGate API Server (Mặc định: http://localhost:8000 hoặc IP LAN):</label>
+              <div class="input-with-button">
+                <input type="text" id="gateway-url-input" value="http://localhost:8000" placeholder="http://localhost:8000">
+                <button class="btn-primary" onclick="testGatewayConnection()">
+                  <i class="fa-solid fa-link"></i> Kiểm tra & Đồng bộ
+                </button>
+              </div>
+            </div>
+
+            <div class="connection-result" id="connection-result-box">
+              <i class="fa-solid fa-circle-info"></i>
+              <span id="connection-result-text">Hiện tại trang web đang phục vụ dữ liệu từ bộ nhớ cục bộ (Local Storage). Bạn có thể thử nghiệm tạo công nhân, quét thẻ, lọc log và xuất file CSV trực tiếp!</span>
+            </div>
+
+            <hr class="form-divider">
+
+            <div class="reset-data-group">
+              <h3>Dọn dẹp & Khôi phục dữ liệu mẫu:</h3>
+              <p>Khôi phục lại danh sách công nhân và nhật ký mẫu ban đầu nếu bạn muốn làm mới dữ liệu.</p>
+              <button class="btn-secondary" onclick="resetToDefaultData()">
+                <i class="fa-solid fa-arrows-rotate"></i> Khôi phục dữ liệu mẫu
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL 1: VIEW & PRINT QR BADGE -->
+  <dialog class="modal-dialog" id="badge-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>THẺ ĐỊNH DANH CÔNG NHÂN</h2>
+        <button class="btn-close" onclick="closeModal('badge-dialog')" aria-label="Close dialog">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Thẻ nhân viên chuẩn in -->
+        <div class="badge-print-card" id="printable-badge">
+          <div class="badge-top-banner">
+            <div class="badge-logo-mark"><i class="fa-solid fa-shield-halved"></i> SAFEGATE</div>
+            <div class="badge-sub-mark">CỔNG KIỂM TRA ĐỒ BẢO HỘ LAO ĐỘNG</div>
+          </div>
+
+          <div class="badge-qr-box">
+            <div id="badge-qr-canvas"></div>
+          </div>
+
+          <div class="badge-worker-info">
+            <h3 class="badge-name" id="badge-modal-name">NGUYỄN VĂN AN</h3>
+            <div class="badge-code-tag" id="badge-modal-code">NV-1001</div>
+            <div class="badge-dept" id="badge-modal-dept">Thi công kết cấu</div>
+            <div class="badge-role" id="badge-modal-role">Thợ sắt</div>
+          </div>
+
+          <div class="badge-footer-line">
+            <span>XUẤT TRÌNH TẠI CỔNG TRƯỚC KHI VÀO LÀM VIỆC</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="window.print()">
+          <i class="fa-solid fa-print"></i> In thẻ
+        </button>
+        <button class="btn-primary" onclick="closeModal('badge-dialog')">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- MODAL 2: ADD NEW WORKER -->
+  <dialog class="modal-dialog" id="add-worker-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>ĐĂNG KÝ NHÂN VIÊN MỚI</h2>
+        <button class="btn-close" onclick="closeModal('add-worker-dialog')" aria-label="Close dialog">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="add-worker-form" onsubmit="handleCreateWorker(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="new-worker-code">Mã nhân viên (duy nhất) *</label>
+            <input type="text" id="new-worker-code" required placeholder="Ví dụ: NV-1008">
+          </div>
+
+          <div class="form-group">
+            <label for="new-worker-name">Họ và tên *</label>
+            <input type="text" id="new-worker-name" required placeholder="Nguyễn Văn A">
+          </div>
+
+          <div class="form-group">
+            <label for="new-worker-dept">Đơn vị / Đội thi công *</label>
+            <select id="new-worker-dept" required>
+              <option value="Thi công kết cấu">Thi công kết cấu</option>
+              <option value="Cơ điện MEP">Cơ điện MEP</option>
+              <option value="Hoàn thiện xây dựng">Hoàn thiện xây dựng</option>
+              <option value="Ban an toàn HSE">Ban an toàn HSE</option>
+              <option value="Ban chỉ huy công trường">Ban chỉ huy công trường</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="new-worker-role">Chức danh / Vị trí</label>
+            <input type="text" id="new-worker-role" placeholder="Công nhân, Kỹ sư, Giám sát..." value="Công nhân">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal('add-worker-dialog')">Hủy</button>
+          <button type="submit" class="btn-primary"><i class="fa-solid fa-save"></i> Lưu & Sinh mã QR</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Script Application -->
+  <script src="app.js"></script>
+</body>
+</html>
