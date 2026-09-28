@@ -20,6 +20,7 @@ safegate/database/*.db
 # Large weights & model checkpoints
 *.pt
 *.onnx
+*.part
 models/*.pt
 models/*.onnx
 
